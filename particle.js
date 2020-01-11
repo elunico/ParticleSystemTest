@@ -15,13 +15,14 @@ class Particle {
 
   seek(x, y) {
     let goal = p5.Vector.sub(createVector(mouseX, mouseY), this.pos);
-    goal.setMag(this.maxForce);
+    goal.limit(this.maxForce);
     this.applyForce(goal);
   }
 
   flee(x, y) {
     let goal = p5.Vector.sub(createVector(mouseX, mouseY), this.pos);
-    goal.setMag(-this.maxForce);
+    goal.limit(this.maxForce);
+    goal.mult(-1);
     this.applyForce(goal);
   }
 
