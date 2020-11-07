@@ -6,6 +6,7 @@ class Particle {
     // this.color = color(160, 30, 200);
     this.size = size;
     this.maxForce = 3;
+    this.maxVelcity = 10;
     this.airResistance = 0.01;
   }
 
@@ -14,13 +15,13 @@ class Particle {
   }
 
   seek(x, y) {
-    let goal = p5.Vector.sub(createVector(mouseX, mouseY), this.pos);
+    let goal = p5.Vector.sub(createVector(x, y), this.pos);
     goal.limit(this.maxForce);
     this.applyForce(goal);
   }
 
   flee(x, y) {
-    let goal = p5.Vector.sub(createVector(mouseX, mouseY), this.pos);
+    let goal = p5.Vector.sub(createVector(x, y), this.pos);
     goal.limit(this.maxForce);
     goal.mult(-1);
     this.applyForce(goal);
@@ -34,6 +35,8 @@ class Particle {
     this.vel.add(this.acc);
     this.pos.add(this.vel);
     this.acc.mult(0);
+
+    // this.vel.limit(this.maxVelcity);
 
     if (this.pos.x > width || this.pos.x < 0) {
       this.vel.x = -(this.vel.x * 0.9);

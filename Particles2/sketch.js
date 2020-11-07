@@ -1,14 +1,8 @@
 // Inspired (copied) from Coding Challenge 56 from the Coding Train
 
 let particles = [];
+let sources = [];
 
-let gravity = false;
-let gravityForce;
-
-let seeking = true;
-let looping = true;
-
-let gravityDiv;
 let airResistanceDiv;
 let airResistanceSlider;
 
@@ -19,13 +13,8 @@ let seekButton;
 let haltButton;
 let currentFPS;
 
-function keyPressed(event) {
-  if (key == ' ') {
-    gravity = !gravity;
-    gravityDiv.html(gravity ? 'Gravity Enabled.' : "Gravity Disabled.");
-    event.preventDefault();
-  }
-}
+let looping = true;
+let seeking = true;
 
 function setup() {
 
@@ -42,23 +31,18 @@ function setup() {
   });
   createDiv('');
   createCanvas(600, 400);
-  gravityForce = createVector(0, 1);
 
-  for (let i = 0; i < 100; i++) {
-    particles.push(new Particle(random(width), random(height), p5.Vector.random2D()));
-  }
   createDiv('');
-  seekButton = createButton('Seeking Mouse on Click');
+  seekButton = createButton('Click adds Attractor');
   seekButton.mousePressed(() => {
     seeking = !seeking;
     if (seeking) {
-      seekButton.html('Seeking Mouse on Click');
+      seekButton.html('Click adds Attractor');
     } else {
-      seekButton.html('Fleeing Mouse on Click');
+      seekButton.html('Click adds Repulser');
 
     }
   });
-  gravityDiv = createDiv('Gravity Disabled. (Space to toggle).');
   airResistanceDiv = createDiv('Air Resistance: 0.20%');
   airResistanceSlider = createSlider(0, 0.15, 0.002, 0.0001);
   airResistanceSlider.input(() => {
@@ -93,9 +77,24 @@ function setup() {
   maxForceSlider.style('width', `${width}px`);
   particlesCountSlider.style('width', `${width}px`);
 
+  for (let i = 0; i < 100; i++) {
+    particles.push(new Particle(random(width), random(height), p5.Vector.random2D()));
+  }
+
+
   textAlign(CENTER, CENTER);
   textSize(18);
 
+}
+
+function mousePressed() {
+  if (mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0) {
+    if (seeking) {
+      sources.push(new Source(mouseX, mouseY, 10));
+    } else {
+      sources.push(new Source(mouseX, mouseY, 10));
+    }
+  }
 }
 
 
@@ -103,20 +102,20 @@ function draw() {
   colorMode(RGB);
   background(51);
 
+  for (let source of sources) {
+    for (let particle of particles) {
+      source.influence(particle);
+    }
+  }
+
   for (let particle of particles) {
     particle.loseEnergy();
-    if (gravity) {
-      particle.applyForce(gravityForce);
-    }
-    if (mouseIsPressed && mouseX < width && mouseX > 0 && mouseY < height && mouseY > 0) {
-      if (seeking) {
-        particle.seek(mouseX, mouseY);
-      } else {
-        particle.flee(mouseX, mouseY);
-      }
-    }
     particle.update();
     particle.show();
+  }
+
+  for (let source of sources) {
+    source.show();
   }
 
   fill(240);
